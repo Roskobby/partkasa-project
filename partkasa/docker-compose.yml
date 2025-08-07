@@ -1,0 +1,259 @@
+version: '3.8'
+
+services:
+  # API Gateway
+  api-gateway:
+    build: ./api-gateway
+    ports:
+      - "${API_GATEWAY_PORT}:${API_GATEWAY_PORT}"
+    environment:
+      - NODE_ENV=development
+      - PORT=${API_GATEWAY_PORT}
+      - USER_SERVICE_URL=http://user-service:${USER_SERVICE_PORT}
+      - VENDOR_SERVICE_URL=http://vendor-service:${VENDOR_SERVICE_PORT}
+      - SEARCH_SERVICE_URL=http://search-service:${SEARCH_SERVICE_PORT}
+      - ORDER_SERVICE_URL=http://order-service:${ORDER_SERVICE_PORT}
+      - PAYMENT_SERVICE_URL=http://payment-service:${PAYMENT_SERVICE_PORT}
+      - DELIVERY_SERVICE_URL=http://delivery-service:${DELIVERY_SERVICE_PORT}
+      - NOTIFICATION_SERVICE_URL=http://notification-service:${NOTIFICATION_SERVICE_PORT}
+    depends_on:
+      - user-service
+      - vendor-service
+      - search-service
+      - order-service
+      - payment-service
+      - delivery-service
+      - notification-service
+    networks:
+      - partkasa-network
+    restart: unless-stopped
+
+  # Web Client
+  client-web:
+    build: ./client-web
+    ports:
+      - "${CLIENT_PORT}:${CLIENT_PORT}"
+    environment:
+      - NODE_ENV=development
+      - PORT=${CLIENT_PORT}
+      - REACT_APP_API_URL=${REACT_APP_API_URL}
+    volumes:
+      - ./client-web:/app
+      - /app/node_modules
+    networks:
+      - partkasa-network
+    restart: unless-stopped
+
+  # User Service
+  user-service:
+    build: ./user-service
+    environment:
+      - NODE_ENV=development
+      - PORT=${USER_SERVICE_PORT}
+      - POSTGRES_HOST=${POSTGRES_HOST}
+      - POSTGRES_PORT=${POSTGRES_PORT}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_EXPIRATION=${JWT_EXPIRATION}
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - partkasa-network
+    restart: unless-stopped
+
+  # Vendor Service
+  vendor-service:
+    build: ./vendor-service
+    environment:
+      - NODE_ENV=development
+      - PORT=${VENDOR_SERVICE_PORT}
+      - POSTGRES_HOST=${POSTGRES_HOST}
+      - POSTGRES_PORT=${POSTGRES_PORT}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_EXPIRATION=${JWT_EXPIRATION}
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - partkasa-network
+    restart: unless-stopped
+
+  # Search Service
+  search-service:
+    build: ./search-service
+    environment:
+      - NODE_ENV=development
+      - PORT=${SEARCH_SERVICE_PORT}
+      - MONGODB_URI=mongodb://mongo:27017/partkasa_search
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - NHTSA_API_URL=${NHTSA_API_URL}
+      - JWT_SECRET=${JWT_SECRET}
+    depends_on:
+      - mongo
+      - redis
+    networks:
+      - partkasa-network
+    restart: unless-stopped
+
+  # Order Service
+  order-service:
+    build: ./order-service
+    environment:
+      - NODE_ENV=development
+      - PORT=${ORDER_SERVICE_PORT}
+      - POSTGRES_HOST=${POSTGRES_HOST}
+      - POSTGRES_PORT=${POSTGRES_PORT}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - NOTIFICATION_SERVICE_URL=http://notification-service:${NOTIFICATION_SERVICE_PORT}
+    depends_on:
+      - postgres
+      - redis
+      - notification-service
+    networks:
+      - partkasa-network
+    restart: unless-stopped
+
+  # Payment Service
+  payment-service:
+    build: ./payment-service
+    environment:
+      - NODE_ENV=development
+      - PORT=${PAYMENT_SERVICE_PORT}
+      - POSTGRES_HOST=${POSTGRES_HOST}
+      - POSTGRES_PORT=${POSTGRES_PORT}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - PAYSTACK_SECRET_KEY=${PAYSTACK_SECRET_KEY}
+      - PAYSTACK_PUBLIC_KEY=${PAYSTACK_PUBLIC_KEY}
+      - MOMO_API_KEY=${MOMO_API_KEY}
+      - NOTIFICATION_SERVICE_URL=http://notification-service:${NOTIFICATION_SERVICE_PORT}
+    depends_on:
+      - postgres
+      - redis
+      - notification-service
+    networks:
+      - partkasa-network
+    restart: unless-stopped
+
+  # Delivery Service
+  delivery-service:
+    build: ./delivery-service
+    environment:
+      - NODE_ENV=development
+      - PORT=${DELIVERY_SERVICE_PORT}
+      - POSTGRES_HOST=${POSTGRES_HOST}
+      - POSTGRES_PORT=${POSTGRES_PORT}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - NOTIFICATION_SERVICE_URL=http://notification-service:${NOTIFICATION_SERVICE_PORT}
+    depends_on:
+      - postgres
+      - redis
+      - notification-service
+    networks:
+      - partkasa-network
+    restart: unless-stopped
+
+  # Notification Service
+  notification-service:
+    build: ./notification-service
+    environment:
+      - NODE_ENV=development
+      - PORT=${NOTIFICATION_SERVICE_PORT}
+      - POSTGRES_HOST=${POSTGRES_HOST}
+      - POSTGRES_PORT=${POSTGRES_PORT}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - TWILIO_ACCOUNT_SID=${TWILIO_ACCOUNT_SID}
+      - TWILIO_AUTH_TOKEN=${TWILIO_AUTH_TOKEN}
+      - TWILIO_PHONE_NUMBER=${TWILIO_PHONE_NUMBER}
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_PORT=${SMTP_PORT}
+      - SMTP_USER=${SMTP_USER}
+      - SMTP_PASSWORD=${SMTP_PASSWORD}
+      - EMAIL_FROM=${EMAIL_FROM}
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - partkasa-network
+    restart: unless-stopped
+
+  # PostgreSQL Database
+  postgres:
+    image: postgres:14-alpine
+    ports:
+      - "${POSTGRES_PORT}:5432"
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - partkasa-network
+    restart: unless-stopped
+
+  # MongoDB (Optional)
+  mongo:
+    image: mongo:5
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - partkasa-network
+    restart: unless-stopped
+
+  # Redis Cache
+  redis:
+    image: redis:6-alpine
+    ports:
+      - "${REDIS_PORT}:6379"
+    command: redis-server --requirepass ${REDIS_PASSWORD}
+    volumes:
+      - redis-data:/data
+    networks:
+      - partkasa-network
+    restart: unless-stopped
+
+networks:
+  partkasa-network:
+    driver: bridge
+
+volumes:
+  postgres-data:
+  mongo-data:
+  redis-data:
