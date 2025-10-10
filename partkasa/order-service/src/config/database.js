@@ -2,7 +2,7 @@ const { Sequelize } = require('sequelize');
 const logger = require('../utils/logger');
 
 const sequelize = new Sequelize(
-  process.env.POSTGRES_DB,
+  process.env.ORDER_SERVICE_DB || process.env.POSTGRES_DB,
   process.env.POSTGRES_USER,
   process.env.POSTGRES_PASSWORD,
   {

@@ -6,7 +6,7 @@ const morgan = require('morgan');
 const { sequelize } = require('./models');
 const logger = require('./utils/logger');
 const routes = require('./routes');
-const errorHandler = require('./middleware/errorHandler');
+const { errorHandler } = require('./middleware/errorHandler');
 
 // Initialize Express app
 const app = express();
