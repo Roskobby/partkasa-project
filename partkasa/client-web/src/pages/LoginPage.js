@@ -1,4 +1,11 @@
-import React, { useState } from 'react';
+import useSEO from '../hooks/useSEO';
+
+export default (function WrapSEO(Component){
+  return function SEOPageWrapper(props){
+    useSEO({ title: 'PartKasa – Login to your PartKasa account', description: 'Login to your PartKasa account' });
+    return <Component {...props} />;
+  }
+})(import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
@@ -132,3 +139,4 @@ const LoginPage = () => {
 };
 
 export default LoginPage;
+\n);\n

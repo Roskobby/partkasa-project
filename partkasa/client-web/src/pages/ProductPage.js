@@ -1,4 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import useSEO from '../hooks/useSEO';
+
+export default (function WrapSEO(Component){
+  return function SEOPageWrapper(props){
+    useSEO({ title: 'PartKasa – Auto part details, fitment, and pricing', description: 'Auto part details, fitment, and pricing' });
+    return <Component {...props} />;
+  }
+})(import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 
 const ProductPage = () => {
@@ -120,3 +127,4 @@ const ProductPage = () => {
 };
 
 export default ProductPage;
+\n);\n

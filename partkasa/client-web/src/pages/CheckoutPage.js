@@ -1,4 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import useSEO from '../hooks/useSEO';
+
+export default (function WrapSEO(Component){
+  return function SEOPageWrapper(props){
+    useSEO({ title: 'PartKasa – Checkout and payment', description: 'Checkout and payment' });
+    return <Component {...props} />;
+  }
+})(import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
@@ -443,3 +450,4 @@ const CheckoutPage = () => {
 };
 
 export default CheckoutPage;
+\n);\n

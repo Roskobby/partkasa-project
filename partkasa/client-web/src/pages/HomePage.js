@@ -1,4 +1,11 @@
-import React from 'react';
+import useSEO from '../hooks/useSEO';
+
+export default (function WrapSEO(Component){
+  return function SEOPageWrapper(props){
+    useSEO({ title: 'PartKasa – Find and buy auto parts fast', description: 'Find and buy auto parts fast' });
+    return <Component {...props} />;
+  }
+})(import React from 'react';
 import { Link } from 'react-router-dom';
 import { MagnifyingGlassIcon, TruckIcon, ShieldCheckIcon, CreditCardIcon } from '@heroicons/react/24/outline';
 
@@ -259,3 +266,4 @@ const HomePage = () => {
 };
 
 export default HomePage;
+\n);\n

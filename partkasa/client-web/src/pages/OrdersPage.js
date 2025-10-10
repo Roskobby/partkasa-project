@@ -1,4 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import useSEO from '../hooks/useSEO';
+
+export default (function WrapSEO(Component){
+  return function SEOPageWrapper(props){
+    useSEO({ title: 'PartKasa – Your orders and delivery status', description: 'Your orders and delivery status' });
+    return <Component {...props} />;
+  }
+})(import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 
 const OrdersPage = () => {
@@ -135,3 +142,4 @@ const OrdersPage = () => {
 };
 
 export default OrdersPage;
+\n);\n

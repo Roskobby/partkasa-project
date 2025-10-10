@@ -1,4 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import useSEO from '../hooks/useSEO';
+
+export default (function WrapSEO(Component){
+  return function SEOPageWrapper(props){
+    useSEO({ title: 'PartKasa – Search results for auto parts', description: 'Search results for auto parts' });
+    return <Component {...props} />;
+  }
+})(import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
@@ -311,3 +318,4 @@ const SearchResultsPage = () => {
 };
 
 export default SearchResultsPage;
+\n);\n

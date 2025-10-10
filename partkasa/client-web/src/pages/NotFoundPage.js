@@ -1,4 +1,11 @@
-import React from 'react';
+import useSEO from '../hooks/useSEO';
+
+export default (function WrapSEO(Component){
+  return function SEOPageWrapper(props){
+    useSEO({ title: 'PartKasa – Page not found', description: 'Page not found' });
+    return <Component {...props} />;
+  }
+})(import React from 'react';
 import { Link } from 'react-router-dom';
 
 const NotFoundPage = () => {
@@ -22,3 +29,4 @@ const NotFoundPage = () => {
 };
 
 export default NotFoundPage;
+\n);\n
