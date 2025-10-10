@@ -28,7 +28,13 @@
       "command": "npm start",
       "options": { "cwd": "partkasa/client-web" },
       "problemMatcher": []
+    },
+    {
+      "label": "next-web: dev",
+      "type": "shell",
+      "command": "npm run dev",
+      "options": { "cwd": "partkasa/next-web" },
+      "problemMatcher": []
     }
   ]
 }
-
