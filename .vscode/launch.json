@@ -1,0 +1,29 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "API Gateway (Node)",
+      "type": "pwa-node",
+      "request": "launch",
+      "program": "${workspaceFolder}/partkasa/api-gateway/src/index.js",
+      "cwd": "${workspaceFolder}/partkasa/api-gateway",
+      "envFile": "${workspaceFolder}/partkasa/.env",
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Client Web (Chrome)",
+      "type": "pwa-chrome",
+      "request": "launch",
+      "url": "http://localhost:3000",
+      "webRoot": "${workspaceFolder}/partkasa/client-web/src",
+      "preLaunchTask": "client-web: start"
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Web + API",
+      "configurations": ["API Gateway (Node)", "Client Web (Chrome)"]
+    }
+  ]
+}
+

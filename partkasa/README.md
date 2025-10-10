@@ -27,7 +27,9 @@ The platform is built using a microservices architecture with Docker containeriz
 The API Gateway serves as the entry point for all client requests. It routes requests to the appropriate microservices and handles cross-cutting concerns like authentication, logging, and request/response transformation.
 
 ### Client Web
-The web client is built with React and TailwindCSS, providing a responsive and modern user interface for customers to search for and purchase auto parts.
+The primary web client is located at `partkasa/client-web` (React + TailwindCSS), providing a responsive and modern UI for customers to search for and purchase auto parts.
+
+Note: an older demo client previously at the repository root has been archived to `archive/client-web` to avoid confusion.
 
 ### User Service
 The User Service handles user authentication, registration, and profile management. It uses PostgreSQL for data storage and JWT for authentication.
@@ -78,7 +80,7 @@ The Notification Service sends notifications to users and vendors through variou
    docker-compose up -d
    ```
 
-5. Access the web client at `http://localhost:3000` and the API at `http://localhost:8000/api`.
+5. Access the web client at `http://localhost:3000` (from `partkasa/client-web`) and the API at `http://localhost:8000/api`.
 
 ## Development
 

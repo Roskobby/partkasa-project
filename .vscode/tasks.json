@@ -1,0 +1,34 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "compose: up",
+      "type": "shell",
+      "command": "docker-compose up -d",
+      "options": { "cwd": "partkasa" },
+      "problemMatcher": []
+    },
+    {
+      "label": "compose: down",
+      "type": "shell",
+      "command": "docker-compose down",
+      "options": { "cwd": "partkasa" },
+      "problemMatcher": []
+    },
+    {
+      "label": "api-gateway: dev",
+      "type": "shell",
+      "command": "npm run dev",
+      "options": { "cwd": "partkasa/api-gateway" },
+      "problemMatcher": []
+    },
+    {
+      "label": "client-web: start",
+      "type": "shell",
+      "command": "npm start",
+      "options": { "cwd": "partkasa/client-web" },
+      "problemMatcher": []
+    }
+  ]
+}
+
