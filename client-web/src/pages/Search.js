@@ -33,14 +33,43 @@ function Search() {
 
     setError('');
 
-    const params = new URLSearchParams({
-      destination: form.destination,
-      checkIn: form.checkIn,
-      checkOut: form.checkOut,
-      guests: String(form.guests),
-    });
+    const trimmedDestination = form.destination.trim();
+    const params = new URLSearchParams();
 
-    navigate(`/results?${params.toString()}`);
+    if (trimmedDestination) {
+      params.set('destination', trimmedDestination);
+    }
+
+    if (form.checkIn) {
+      params.set('checkIn', form.checkIn);
+    }
+
+    if (form.checkOut) {
+      params.set('checkOut', form.checkOut);
+    }
+
+    if (typeof form.guests === 'number' && form.guests > 0) {
+      params.set('guests', String(form.guests));
+    }
+
+    const searchQuery = params.toString();
+
+    navigate(
+      {
+        pathname: '/results',
+        search: searchQuery ? `?${searchQuery}` : '',
+      },
+      {
+        state: {
+          search: {
+            destination: trimmedDestination,
+            checkIn: form.checkIn,
+            checkOut: form.checkOut,
+            guests: typeof form.guests === 'number' && form.guests > 0 ? form.guests : null,
+          },
+        },
+      },
+    );
   };
 
   return (

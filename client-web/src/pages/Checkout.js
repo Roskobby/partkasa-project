@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, useLocation, useParams } from 'react-router-dom';
+import { Link, useLocation, useParams, useSearchParams } from 'react-router-dom';
 import { getListingById } from '../data/listings';
 
 function formatCurrency(amount) {
@@ -9,9 +9,54 @@ function formatCurrency(amount) {
   }).format(amount);
 }
 
+function formatDate(dateString) {
+  if (!dateString) {
+    return '';
+  }
+
+  const date = new Date(dateString);
+
+  if (Number.isNaN(date.getTime())) {
+    return '';
+  }
+
+  return new Intl.DateTimeFormat('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  }).format(date);
+}
+
+function calculateNights(checkIn, checkOut) {
+  if (!checkIn || !checkOut) {
+    return null;
+  }
+
+  const start = new Date(checkIn);
+  const end = new Date(checkOut);
+
+  if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) {
+    return null;
+  }
+
+  const msPerNight = 1000 * 60 * 60 * 24;
+  const difference = Math.round((end - start) / msPerNight);
+
+  return difference > 0 ? difference : null;
+}
+
+function formatGuests(guestCount) {
+  if (typeof guestCount !== 'number' || Number.isNaN(guestCount) || guestCount <= 0) {
+    return '';
+  }
+
+  return `${guestCount} ${guestCount === 1 ? 'guest' : 'guests'}`;
+}
+
 function Checkout() {
   const params = useParams();
   const location = useLocation();
+  const [searchParams] = useSearchParams();
   const listingId = params.listingId || location.state?.listingId || null;
   const listing = listingId ? getListingById(listingId) : undefined;
 
@@ -32,9 +77,37 @@ function Checkout() {
     );
   }
 
-  const { title, location: city, pricePerNight, summary } = listing;
-  const nights = summary.nights ?? 1;
+  const { title, location: city, pricePerNight, summary: listingSummary = {} } = listing;
+  const summaryState = location.state?.search ?? {};
+
+  const checkInParam = searchParams.get('checkIn');
+  const checkOutParam = searchParams.get('checkOut');
+  const guestsParam = searchParams.get('guests');
+
+  const checkInIso = checkInParam && checkInParam.trim().length > 0 ? checkInParam : summaryState.checkIn || '';
+  const checkOutIso = checkOutParam && checkOutParam.trim().length > 0 ? checkOutParam : summaryState.checkOut || '';
+  let guestsFromSearch = null;
+
+  if (guestsParam && guestsParam.trim().length > 0) {
+    const parsedGuests = Number(guestsParam);
+    guestsFromSearch = Number.isFinite(parsedGuests) && parsedGuests > 0 ? parsedGuests : null;
+  } else if (typeof summaryState.guests === 'number' && summaryState.guests > 0) {
+    guestsFromSearch = summaryState.guests;
+  }
+
+  const nightsFromSearch = calculateNights(checkInIso, checkOutIso);
+  const nights = nightsFromSearch ?? listingSummary.nights ?? 1;
   const total = pricePerNight * nights;
+
+  const checkInDisplay = checkInIso ? formatDate(checkInIso) : listingSummary.checkIn || '';
+  const checkOutDisplay = checkOutIso ? formatDate(checkOutIso) : listingSummary.checkOut || '';
+  const dateDisplay = checkInDisplay && checkOutDisplay
+    ? `${checkInDisplay} - ${checkOutDisplay}`
+    : listingSummary.checkIn && listingSummary.checkOut
+      ? `${listingSummary.checkIn} - ${listingSummary.checkOut}`
+      : 'Add dates to complete your booking';
+
+  const guestsDisplay = formatGuests(guestsFromSearch) || listingSummary.guests || 'Add guest details';
 
   return (
     <section className="mx-auto max-w-2xl space-y-6 rounded-lg bg-white p-6 shadow">
@@ -58,13 +131,11 @@ function Checkout() {
             </div>
             <div className="flex justify-between">
               <dt>Dates</dt>
-              <dd>
-                {summary.checkIn} - {summary.checkOut}
-              </dd>
+              <dd>{dateDisplay}</dd>
             </div>
             <div className="flex justify-between">
               <dt>Guests</dt>
-              <dd>{summary.guests}</dd>
+              <dd>{guestsDisplay}</dd>
             </div>
             <div className="flex justify-between">
               <dt>Nightly rate</dt>
