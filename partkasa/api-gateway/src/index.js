@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const crypto = require('crypto');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const { createProxyMiddleware } = require('http-proxy-middleware');
@@ -18,7 +19,19 @@ const PORT = process.env.PORT || 8000;
 
 // Apply global middleware
 app.use(helmet()); // Security headers
-app.use(cors()); // Enable CORS
+
+// CORS allowlist via env API_CORS_ORIGINS (comma-separated)
+const corsOrigins = (process.env.API_CORS_ORIGINS || '').split(',').map((s) => s.trim()).filter(Boolean);
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true); // allow non-browser clients
+      if (corsOrigins.length === 0 || corsOrigins.includes(origin)) return callback(null, true);
+      return callback(new Error('Not allowed by CORS'));
+    },
+    credentials: true,
+  })
+); // Enable CORS with allowlist
 app.use(express.json()); // Parse JSON bodies
 app.use(morgan('combined')); // HTTP request logging
 
@@ -30,6 +43,21 @@ const limiter = rateLimit({
   legacyHeaders: false,
 });
 app.use(limiter);
+
+// Request ID correlation: ensure x-request-id exists and is returned to client
+app.use((req, res, next) => {
+  let rid = req.headers['x-request-id'];
+  if (!rid) {
+    try {
+      rid = crypto.randomUUID();
+    } catch (e) {
+      rid = Math.random().toString(36).slice(2);
+    }
+    req.headers['x-request-id'] = rid;
+  }
+  res.setHeader('x-request-id', rid);
+  next();
+});
 
 // Health check routes (no auth required)
 app.use('/health', healthRoutes);
@@ -45,6 +73,15 @@ app.use(
     pathRewrite: {
       '^/api/users': '',
     },
+    onProxyReq(proxyReq, req) {
+      if (req.headers['x-request-id']) {
+        proxyReq.setHeader('x-request-id', req.headers['x-request-id']);
+      }
+    },
+    onProxyRes(proxyRes, req, res) {
+      const rid = req.headers['x-request-id'];
+      if (rid) res.setHeader('x-request-id', rid);
+    },
   })
 );
 
@@ -58,6 +95,15 @@ app.use(
     pathRewrite: {
       '^/api/vendors': '',
     },
+    onProxyReq(proxyReq, req) {
+      if (req.headers['x-request-id']) {
+        proxyReq.setHeader('x-request-id', req.headers['x-request-id']);
+      }
+    },
+    onProxyRes(proxyRes, req, res) {
+      const rid = req.headers['x-request-id'];
+      if (rid) res.setHeader('x-request-id', rid);
+    },
   })
 );
 
@@ -69,6 +115,15 @@ app.use(
     changeOrigin: true,
     pathRewrite: {
       '^/api/search': '',
+    },
+    onProxyReq(proxyReq, req) {
+      if (req.headers['x-request-id']) {
+        proxyReq.setHeader('x-request-id', req.headers['x-request-id']);
+      }
+    },
+    onProxyRes(proxyRes, req, res) {
+      const rid = req.headers['x-request-id'];
+      if (rid) res.setHeader('x-request-id', rid);
     },
   })
 );
@@ -83,6 +138,15 @@ app.use(
     pathRewrite: {
       '^/api/orders': '',
     },
+    onProxyReq(proxyReq, req) {
+      if (req.headers['x-request-id']) {
+        proxyReq.setHeader('x-request-id', req.headers['x-request-id']);
+      }
+    },
+    onProxyRes(proxyRes, req, res) {
+      const rid = req.headers['x-request-id'];
+      if (rid) res.setHeader('x-request-id', rid);
+    },
   })
 );
 
@@ -95,6 +159,15 @@ app.use(
     changeOrigin: true,
     pathRewrite: {
       '^/api/payments': '',
+    },
+    onProxyReq(proxyReq, req) {
+      if (req.headers['x-request-id']) {
+        proxyReq.setHeader('x-request-id', req.headers['x-request-id']);
+      }
+    },
+    onProxyRes(proxyRes, req, res) {
+      const rid = req.headers['x-request-id'];
+      if (rid) res.setHeader('x-request-id', rid);
     },
   })
 );
@@ -109,6 +182,15 @@ app.use(
     pathRewrite: {
       '^/api/delivery': '',
     },
+    onProxyReq(proxyReq, req) {
+      if (req.headers['x-request-id']) {
+        proxyReq.setHeader('x-request-id', req.headers['x-request-id']);
+      }
+    },
+    onProxyRes(proxyRes, req, res) {
+      const rid = req.headers['x-request-id'];
+      if (rid) res.setHeader('x-request-id', rid);
+    },
   })
 );
 
@@ -121,6 +203,15 @@ app.use(
     changeOrigin: true,
     pathRewrite: {
       '^/api/notifications': '',
+    },
+    onProxyReq(proxyReq, req) {
+      if (req.headers['x-request-id']) {
+        proxyReq.setHeader('x-request-id', req.headers['x-request-id']);
+      }
+    },
+    onProxyRes(proxyRes, req, res) {
+      const rid = req.headers['x-request-id'];
+      if (rid) res.setHeader('x-request-id', rid);
     },
   })
 );
