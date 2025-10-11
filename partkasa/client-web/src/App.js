@@ -1,7 +1,7 @@
 import React, { Suspense, lazy } from 'react';
 import { Routes, Route } from 'react-router-dom';
-
-// Layout components
+import Spinner from './components/ui/Spinner';
+import { AuthProvider } from './context/AuthContext';
 import Layout from './components/layout/Layout';
 
 // Lazy-loaded pages (route-level code splitting)
@@ -20,11 +20,6 @@ const VendorDashboardPage = lazy(() => import('./pages/vendor/DashboardPage'));
 const VendorPartsPage = lazy(() => import('./pages/vendor/PartsPage'));
 const VendorUploadPage = lazy(() => import('./pages/vendor/UploadPage'));
 const VendorOrdersPage = lazy(() => import('./pages/vendor/OrdersPage'));
-
-import Spinner from './components/ui/Spinner';
-
-// Auth provider
-import { AuthProvider } from './context/AuthContext';
 
 function App() {
   return (

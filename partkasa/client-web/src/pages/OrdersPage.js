@@ -1,14 +1,9 @@
+import React, { useState, useEffect } from 'react';
+import { useAuth } from '../context/AuthContext';
 import useSEO from '../hooks/useSEO';
 
-export default (function WrapSEO(Component){
-  return function SEOPageWrapper(props){
-    useSEO({ title: 'PartKasa – Your orders and delivery status', description: 'Your orders and delivery status' });
-    return <Component {...props} />;
-  }
-})(import React, { useState, useEffect } from 'react';
-import { useAuth } from '../context/AuthContext';
-
 const OrdersPage = () => {
+  useSEO({ title: 'PartKasa - Your orders and delivery status', description: 'Your orders and delivery status' });
   const { user } = useAuth();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -18,9 +13,7 @@ const OrdersPage = () => {
     const fetchOrders = async () => {
       try {
         const response = await fetch(`${process.env.REACT_APP_API_URL}/api/orders`, {
-          headers: {
-            'Authorization': `Bearer ${user.token}`
-          }
+          headers: { Authorization: `Bearer ${user.token}` },
         });
         const data = await response.json();
         setOrders(data);
@@ -39,7 +32,7 @@ const OrdersPage = () => {
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-600"></div>
       </div>
     );
   }
@@ -58,81 +51,35 @@ const OrdersPage = () => {
     return (
       <div className="container mx-auto px-4 py-8 text-center">
         <h1 className="text-3xl font-bold mb-4">No Orders Yet</h1>
-        <p className="text-gray-600">You haven't placed any orders yet.</p>
+        <p className="text-gray-600">You have not placed any orders yet.</p>
       </div>
     );
   }
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8">My Orders</h1>
-      
+      <h1 className="text-3xl font-bold mb-6">Your Orders</h1>
       <div className="space-y-6">
-        {orders.map(order => (
-          <div key={order.id} className="bg-white rounded-lg shadow overflow-hidden">
-            <div className="p-6">
-              <div className="flex justify-between items-start mb-4">
-                <div>
-                  <h2 className="text-lg font-semibold">Order #{order.orderNumber}</h2>
-                  <p className="text-sm text-gray-600">
-                    Placed on {new Date(order.createdAt).toLocaleDateString()}
-                  </p>
-                </div>
-                <div className="text-right">
-                  <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
-                    order.status === 'delivered' ? 'bg-green-100 text-green-800' :
-                    order.status === 'processing' ? 'bg-blue-100 text-blue-800' :
-                    order.status === 'shipped' ? 'bg-yellow-100 text-yellow-800' :
-                    'bg-gray-100 text-gray-800'
-                  }`}>
-                    {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
-                  </span>
-                </div>
+        {orders.map((order) => (
+          <div key={order.id} className="bg-white rounded-lg shadow p-6">
+            <div className="flex justify-between items-start">
+              <div>
+                <div className="font-semibold">Order #{order.id}</div>
+                <div className="text-sm text-gray-600">Placed on {new Date(order.createdAt).toLocaleString()}</div>
               </div>
-
-              <div className="border-t border-b py-4 mb-4">
-                {order.items.map(item => (
-                  <div key={item.id} className="flex items-center py-2">
-                    <img 
-                      src={item.image} 
-                      alt={item.name}
-                      className="w-16 h-16 object-cover rounded"
-                    />
-                    <div className="ml-4 flex-1">
-                      <h3 className="font-medium">{item.name}</h3>
-                      <p className="text-sm text-gray-600">
-                        Quantity: {item.quantity} Ã— ${item.price}
-                      </p>
-                    </div>
-                    <div className="text-right">
-                      ${(item.quantity * item.price).toFixed(2)}
-                    </div>
-                  </div>
-                ))}
+              <div className="text-right">
+                <div className="font-semibold">GHS {order.total?.toFixed(2)}</div>
+                <div className="text-sm text-gray-600">{order.status}</div>
               </div>
+            </div>
 
-              <div className="flex justify-between items-center">
-                <div>
-                  <p className="text-sm text-gray-600">
-                    Shipping to: {order.shippingAddress.city}, {order.shippingAddress.state}
-                  </p>
-                  <p className="text-sm text-gray-600">
-                    Payment Method: {order.paymentMethod}
-                  </p>
+            <div className="mt-4 divide-y">
+              {order.items?.map((item, idx) => (
+                <div key={idx} className="py-2 flex justify-between text-sm">
+                  <span>{item.name} x {item.quantity}</span>
+                  <span>GHS {(item.price * item.quantity).toFixed(2)}</span>
                 </div>
-                <div className="text-right">
-                  <p className="text-sm text-gray-600">Order Total:</p>
-                  <p className="text-xl font-semibold">${order.total.toFixed(2)}</p>
-                </div>
-              </div>
-
-              {order.status === 'delivered' && (
-                <div className="mt-4 pt-4 border-t">
-                  <button className="text-primary-600 hover:text-primary-800 text-sm font-medium">
-                    Write a Review
-                  </button>
-                </div>
-              )}
+              ))}
             </div>
           </div>
         ))}
@@ -142,4 +89,3 @@ const OrdersPage = () => {
 };
 
 export default OrdersPage;
-\n);\n

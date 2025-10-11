@@ -1,23 +1,13 @@
+import React, { useState, useEffect } from 'react';
+import { useAuth } from '../context/AuthContext';
 import useSEO from '../hooks/useSEO';
 
-export default (function WrapSEO(Component){
-  return function SEOPageWrapper(props){
-    useSEO({ title: 'PartKasa – Your profile and settings', description: 'Your profile and settings' });
-    return <Component {...props} />;
-  }
-})(import React, { useState, useEffect } from 'react';
-import { useAuth } from '../context/AuthContext';
-
 const ProfilePage = () => {
+  useSEO({ title: 'PartKasa - Your profile and settings', description: 'Your profile and settings' });
   const { user } = useAuth();
   const [profile, setProfile] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    address: '',
-  });
+  const [formData, setFormData] = useState({ name: '', email: '', phone: '', address: '' });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -25,188 +15,73 @@ const ProfilePage = () => {
     const fetchProfile = async () => {
       try {
         const response = await fetch(`${process.env.REACT_APP_API_URL}/api/users/profile`, {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-          },
+          headers: { Authorization: `Bearer ${user.token}` },
         });
-        if (!response.ok) {
-          throw new Error('Failed to fetch profile');
-        }
         const data = await response.json();
         setProfile(data);
-        setFormData({
-          name: data.name,
-          email: data.email,
-          phone: data.phone || '',
-          address: data.address || '',
-        });
+        setFormData({ name: data.name || '', email: data.email || '', phone: data.phone || '', address: data.address || '' });
       } catch (err) {
-        setError(err.message);
+        setError('Failed to load profile');
       } finally {
         setLoading(false);
       }
     };
-
-    if (user) {
-      fetchProfile();
-    }
+    if (user) fetchProfile();
   }, [user]);
 
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSave = async () => {
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/users/profile`, {
+      await fetch(`${process.env.REACT_APP_API_URL}/api/users/profile`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${user.token}`,
-        },
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${user.token}` },
         body: JSON.stringify(formData),
       });
-      
-      if (!response.ok) {
-        throw new Error('Failed to update profile');
-      }
-
-      const updatedProfile = await response.json();
-      setProfile(updatedProfile);
       setIsEditing(false);
     } catch (err) {
-      setError(err.message);
+      setError('Failed to update profile');
     }
   };
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
       </div>
     );
   }
 
   if (error) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
-          <span className="block sm:inline">{error}</span>
-        </div>
-      </div>
-    );
+    return <div className="container mx-auto px-4 py-8 text-red-600">{error}</div>;
   }
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="max-w-3xl mx-auto">
-        <div className="bg-white shadow rounded-lg p-6">
-          <div className="flex justify-between items-center mb-6">
-            <h1 className="text-2xl font-bold text-gray-900">Profile</h1>
-            {!isEditing && (
-              <button
-                onClick={() => setIsEditing(true)}
-                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-              >
-                Edit Profile
-              </button>
-            )}
+      <h1 className="text-3xl font-bold mb-6">Your Profile</h1>
+
+      <div className="bg-white rounded-lg shadow p-6 max-w-2xl">
+        {!isEditing ? (
+          <div className="space-y-2">
+            <div><span className="font-semibold">Name:</span> {profile?.name}</div>
+            <div><span className="font-semibold">Email:</span> {profile?.email}</div>
+            <div><span className="font-semibold">Phone:</span> {profile?.phone}</div>
+            <div><span className="font-semibold">Address:</span> {profile?.address}</div>
+            <button className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded" onClick={() => setIsEditing(true)}>Edit</button>
           </div>
-
-          {isEditing ? (
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Name</label>
-                <input
-                  type="text"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Email</label>
-                <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Phone</label>
-                <input
-                  type="tel"
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleChange}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Address</label>
-                <textarea
-                  name="address"
-                  value={formData.address}
-                  onChange={handleChange}
-                  rows="3"
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                ></textarea>
-              </div>
-
-              <div className="flex justify-end space-x-4">
-                <button
-                  type="button"
-                  onClick={() => setIsEditing(false)}
-                  className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
-                >
-                  Save Changes
-                </button>
-              </div>
-            </form>
-          ) : (
-            <div className="space-y-6">
-              <div>
-                <h3 className="text-sm font-medium text-gray-500">Name</h3>
-                <p className="mt-1 text-sm text-gray-900">{profile.name}</p>
-              </div>
-
-              <div>
-                <h3 className="text-sm font-medium text-gray-500">Email</h3>
-                <p className="mt-1 text-sm text-gray-900">{profile.email}</p>
-              </div>
-
-              <div>
-                <h3 className="text-sm font-medium text-gray-500">Phone</h3>
-                <p className="mt-1 text-sm text-gray-900">{profile.phone || 'Not provided'}</p>
-              </div>
-
-              <div>
-                <h3 className="text-sm font-medium text-gray-500">Address</h3>
-                <p className="mt-1 text-sm text-gray-900">{profile.address || 'Not provided'}</p>
-              </div>
+        ) : (
+          <div className="space-y-3">
+            <input className="border rounded p-2 w-full" placeholder="Name" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} />
+            <input className="border rounded p-2 w-full" placeholder="Email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} />
+            <input className="border rounded p-2 w-full" placeholder="Phone" value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} />
+            <input className="border rounded p-2 w-full" placeholder="Address" value={formData.address} onChange={(e) => setFormData({ ...formData, address: e.target.value })} />
+            <div className="flex gap-3">
+              <button className="px-4 py-2 bg-indigo-600 text-white rounded" onClick={handleSave}>Save</button>
+              <button className="px-4 py-2 bg-gray-200 rounded" onClick={() => setIsEditing(false)}>Cancel</button>
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );
 };
 
 export default ProfilePage;
-\n);\n
