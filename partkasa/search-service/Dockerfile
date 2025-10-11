@@ -9,8 +9,12 @@ WORKDIR /app
 # Copy package files
 COPY package*.json ./
 
-# Install production dependencies
-RUN npm ci --omit=dev && npm audit fix
+# Install production dependencies (fallback if no lockfile)
+RUN if [ -f package-lock.json ]; then \
+      npm ci --omit=dev --no-audit --no-fund; \
+    else \
+      npm install --omit=dev --no-audit --no-fund; \
+    fi
 
 # Copy application files
 COPY . .
