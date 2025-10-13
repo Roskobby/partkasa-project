@@ -1,15 +1,10 @@
-import useSEO from '../hooks/useSEO';
-
-export default (function WrapSEO(Component){
-  return function SEOPageWrapper(props){
-    useSEO({ title: 'PartKasa � Shopping cart overview', description: 'Shopping cart overview' });
-    return <Component {...props} />;
-  }
-})(import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import useSEO from '../hooks/useSEO';
 
 const CartPage = () => {
+  useSEO({ title: 'PartKasa - Shopping cart overview', description: 'Shopping cart overview' });
   const navigate = useNavigate();
   const { user } = useAuth();
   const [cart, setCart] = useState(() => {
@@ -35,8 +30,8 @@ const CartPage = () => {
         // Get cart from server
         const response = await fetch(`${process.env.REACT_APP_API_URL}/api/cart`, {
           headers: {
-            'Authorization': `Bearer ${user.token}`
-          }
+            Authorization: `Bearer ${user.token}`,
+          },
         });
         const serverCart = await response.json();
 
@@ -46,10 +41,10 @@ const CartPage = () => {
           await fetch(`${process.env.REACT_APP_API_URL}/api/cart/sync`, {
             method: 'POST',
             headers: {
-              'Authorization': `Bearer ${user.token}`,
-              'Content-Type': 'application/json'
+              Authorization: `Bearer ${user.token}`,
+              'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ items: localCart })
+            body: JSON.stringify({ items: localCart }),
           });
           localStorage.removeItem('cart');
         }
@@ -68,24 +63,24 @@ const CartPage = () => {
 
   const updateQuantity = async (itemId, newQuantity) => {
     if (newQuantity < 1) return;
-    
+
     try {
       if (user) {
         await fetch(`${process.env.REACT_APP_API_URL}/api/cart/items/${itemId}`, {
           method: 'PATCH',
           headers: {
-            'Authorization': `Bearer ${user.token}`,
-            'Content-Type': 'application/json'
+            Authorization: `Bearer ${user.token}`,
+            'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ quantity: newQuantity })
+          body: JSON.stringify({ quantity: newQuantity }),
         });
       }
-      
-      const updatedCart = cart.map(item => 
+
+      const updatedCart = cart.map((item) =>
         item.id === itemId ? { ...item, quantity: newQuantity } : item
       );
       setCart(updatedCart);
-      
+
       if (!user) {
         localStorage.setItem('cart', JSON.stringify(updatedCart));
       }
@@ -101,14 +96,14 @@ const CartPage = () => {
         await fetch(`${process.env.REACT_APP_API_URL}/api/cart/items/${itemId}`, {
           method: 'DELETE',
           headers: {
-            'Authorization': `Bearer ${user.token}`
-          }
+            Authorization: `Bearer ${user.token}`,
+          },
         });
       }
-      
-      const updatedCart = cart.filter(item => item.id !== itemId);
+
+      const updatedCart = cart.filter((item) => item.id !== itemId);
       setCart(updatedCart);
-      
+
       if (!user) {
         localStorage.setItem('cart', JSON.stringify(updatedCart));
       }
@@ -170,7 +165,7 @@ const CartPage = () => {
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-8">Shopping Cart</h1>
-      
+
       <div className="flex flex-col lg:flex-row gap-8">
         {/* Cart Items */}
         <div className="lg:w-2/3">
@@ -183,15 +178,13 @@ const CartPage = () => {
                     alt={item.name}
                     className="w-24 h-24 object-cover rounded-md"
                   />
-                  
+
                   <div className="ml-6 flex-1">
                     <h3 className="text-lg font-medium text-gray-900">{item.name}</h3>
                     <p className="text-sm text-gray-500">Part #: {item.partNumber}</p>
-                    <p className="text-sm text-gray-500 mt-1">
-                      Vendor: {item.vendor}
-                    </p>
+                    <p className="text-sm text-gray-500 mt-1">Vendor: {item.vendor}</p>
                   </div>
-                  
+
                   <div className="ml-6">
                     <div className="flex items-center border rounded-md">
                       <button
@@ -209,13 +202,11 @@ const CartPage = () => {
                       </button>
                     </div>
                   </div>
-                  
+
                   <div className="ml-6">
-                    <p className="text-lg font-medium text-gray-900">
-                      ₵{(item.price * item.quantity).toFixed(2)}
-                    </p>
+                    <p className="text-lg font-medium text-gray-900">GHS {(item.price * item.quantity).toFixed(2)}</p>
                   </div>
-                  
+
                   <button
                     onClick={() => removeItem(item.id)}
                     className="ml-6 text-red-600 hover:text-red-800"
@@ -234,33 +225,33 @@ const CartPage = () => {
         <div className="lg:w-1/3">
           <div className="bg-white shadow-md rounded-lg p-6">
             <h2 className="text-lg font-medium text-gray-900 mb-4">Order Summary</h2>
-            
+
             <div className="space-y-4">
               <div className="flex justify-between">
                 <span className="text-gray-600">Subtotal</span>
-                <span className="text-gray-900">₵{subtotal.toFixed(2)}</span>
+                <span className="text-gray-900">GHS {subtotal.toFixed(2)}</span>
               </div>
-              
+
               <div className="flex justify-between">
                 <span className="text-gray-600">Shipping Fee</span>
-                <span className="text-gray-900">₵{shippingFee.toFixed(2)}</span>
+                <span className="text-gray-900">GHS {shippingFee.toFixed(2)}</span>
               </div>
-              
+
               <div className="border-t pt-4">
                 <div className="flex justify-between font-medium">
                   <span className="text-gray-900">Total</span>
-                  <span className="text-gray-900">₵{total.toFixed(2)}</span>
+                  <span className="text-gray-900">GHS {total.toFixed(2)}</span>
                 </div>
               </div>
             </div>
-            
+
             <button
               onClick={handleCheckout}
               className="w-full mt-6 bg-indigo-600 text-white px-6 py-3 rounded-md hover:bg-indigo-700"
             >
               Proceed to Checkout
             </button>
-            
+
             <button
               onClick={() => navigate('/search')}
               className="w-full mt-4 text-indigo-600 border border-indigo-600 px-6 py-3 rounded-md hover:bg-indigo-50"
@@ -275,4 +266,3 @@ const CartPage = () => {
 };
 
 export default CartPage;
-\n);\n

@@ -32,7 +32,7 @@ services:
   client-web:
     build: ./client-web
     ports:
-      - "${CLIENT_PORT}:${CLIENT_PORT}"
+      - "${CLIENT_PORT}:80"
     environment:
       - NODE_ENV=development
       - PORT=${CLIENT_PORT}

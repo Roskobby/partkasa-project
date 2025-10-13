@@ -85,6 +85,8 @@ app.use(morgan('combined', { stream: logger.stream })); // HTTP request logging
 
 // Routes
 app.use('/api/search', searchRoutes);
+// Health at both /health and /api/health for gateway checks
+app.use('/health', healthRoutes);
 app.use('/api/health', healthRoutes);
 
 // 404 handler

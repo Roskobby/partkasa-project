@@ -1,0 +1,15 @@
+.git
+node_modules
+npm-debug.log*
+yarn.lock
+pnpm-lock.yaml
+coverage
+tests
+test
+Dockerfile
+.dockerignore
+README.md
+.env
+.env.*
+logs
+*.log
