@@ -61,6 +61,7 @@ app.use((req, res, next) => {
 
 // Health check routes (no auth required)
 app.use('/health', healthRoutes);
+app.use('/api/health', healthRoutes); // alias for consistency with other services and docs
 
 // Service routes with authentication
 // User Service

@@ -1,3 +1,4 @@
+import { getApiBase } from '../../config';
 import React, { useState, useEffect } from 'react';
 import VendorDashboardLayout from '../../components/layout/VendorDashboardLayout';
 
@@ -15,7 +16,7 @@ const OrdersPage = () => {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/api/vendor/orders`, {
+        const response = await fetch(`${getApiBase()}/api/vendor/orders`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
           },
@@ -45,7 +46,7 @@ const OrdersPage = () => {
     setStatusUpdateLoading(true);
     setStatusUpdateError(null);
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/orders/${orderId}/status`, {
+      const response = await fetch(`${getApiBase()}/api/orders/${orderId}/status`, {
         method: 'PATCH',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -291,3 +292,5 @@ const OrdersPage = () => {
 };
 
 export default OrdersPage;
+
+

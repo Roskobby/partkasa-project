@@ -1,3 +1,4 @@
+import { getApiBase } from '../config';
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import useSEO from '../hooks/useSEO';
@@ -13,7 +14,7 @@ const ProductPage = () => {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/api/products/${id}`);
+        const response = await fetch(`${getApiBase()}/api/products/${id}`);
         if (!response.ok) throw new Error('Product not found');
         const data = await response.json();
         setProduct(data);
@@ -61,3 +62,5 @@ const ProductPage = () => {
 };
 
 export default ProductPage;
+
+

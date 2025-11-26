@@ -1,3 +1,4 @@
+import { getApiBase } from '../config';
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -30,7 +31,7 @@ const SearchResultsPage = () => {
         sort: sortBy,
         inStock: String(filters.inStock),
       });
-      const { data } = await axios.get(`${process.env.REACT_APP_API_URL}/api/search?${params.toString()}`);
+      const { data } = await axios.get(`${getApiBase()}/api/search?${params.toString()}`);
       setResults(data.results || []);
       setTotalResults(data.total || 0);
     } catch (err) {
@@ -86,3 +87,5 @@ const SearchResultsPage = () => {
 };
 
 export default SearchResultsPage;
+
+

@@ -19,13 +19,18 @@ RUN npm run build
 FROM nginx:alpine
 
 # Copy the build output to replace the default nginx contents
+# Copy the build output to replace the default nginx contents
 COPY --from=build /app/build /usr/share/nginx/html
 
-# Copy custom nginx config if needed
-# COPY nginx.conf /etc/nginx/conf.d/default.conf
+# Add runtime env injection script
+COPY docker-entrypoint.sh /docker-entrypoint.sh
+RUN chmod +x /docker-entrypoint.sh
+
+# Copy custom nginx config
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 # Expose port 80
 EXPOSE 80
 
-# Start Nginx server
-CMD ["nginx", "-g", "daemon off;"]
+# Start with entrypoint that writes env.js then launches nginx
+ENTRYPOINT ["/docker-entrypoint.sh"]

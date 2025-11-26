@@ -1,3 +1,4 @@
+import { getApiBase } from '../config';
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import useSEO from '../hooks/useSEO';
@@ -12,7 +13,7 @@ const OrdersPage = () => {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/api/orders`, {
+        const response = await fetch(`${getApiBase()}/api/orders`, {
           headers: { Authorization: `Bearer ${user.token}` },
         });
         const data = await response.json();
@@ -89,3 +90,5 @@ const OrdersPage = () => {
 };
 
 export default OrdersPage;
+
+

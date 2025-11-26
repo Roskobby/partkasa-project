@@ -1,3 +1,4 @@
+import { getApiBase } from '../config';
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -28,7 +29,7 @@ const CartPage = () => {
 
       try {
         // Get cart from server
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/api/cart`, {
+        const response = await fetch(`${getApiBase()}/api/cart`, {
           headers: {
             Authorization: `Bearer ${user.token}`,
           },
@@ -38,7 +39,7 @@ const CartPage = () => {
         // Merge local cart with server cart
         const localCart = JSON.parse(localStorage.getItem('cart') || '[]');
         if (localCart.length > 0) {
-          await fetch(`${process.env.REACT_APP_API_URL}/api/cart/sync`, {
+          await fetch(`${getApiBase()}/api/cart/sync`, {
             method: 'POST',
             headers: {
               Authorization: `Bearer ${user.token}`,
@@ -66,7 +67,7 @@ const CartPage = () => {
 
     try {
       if (user) {
-        await fetch(`${process.env.REACT_APP_API_URL}/api/cart/items/${itemId}`, {
+        await fetch(`${getApiBase()}/api/cart/items/${itemId}`, {
           method: 'PATCH',
           headers: {
             Authorization: `Bearer ${user.token}`,
@@ -93,7 +94,7 @@ const CartPage = () => {
   const removeItem = async (itemId) => {
     try {
       if (user) {
-        await fetch(`${process.env.REACT_APP_API_URL}/api/cart/items/${itemId}`, {
+        await fetch(`${getApiBase()}/api/cart/items/${itemId}`, {
           method: 'DELETE',
           headers: {
             Authorization: `Bearer ${user.token}`,
@@ -266,3 +267,5 @@ const CartPage = () => {
 };
 
 export default CartPage;
+
+

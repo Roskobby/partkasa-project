@@ -1,5 +1,6 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import axios from 'axios';
+import { getApiBase } from '../config';
 
 // Create the auth context
 const AuthContext = createContext();
@@ -16,7 +17,7 @@ export const AuthProvider = ({ children }) => {
   const [error, setError] = useState('');
 
   // Set up axios defaults
-  axios.defaults.baseURL = process.env.REACT_APP_API_URL;
+  axios.defaults.baseURL = getApiBase();
   
   // Add token to requests if available
   useEffect(() => {
@@ -94,7 +95,7 @@ export const AuthProvider = ({ children }) => {
   const updateProfile = async (userData) => {
     try {
       setError('');
-      const response = await axios.put('/api/users/profile', userData);
+      const response = await axios.put('/users/profile', userData);
       setCurrentUser(response.data.user);
       return response.data.user;
     } catch (err) {

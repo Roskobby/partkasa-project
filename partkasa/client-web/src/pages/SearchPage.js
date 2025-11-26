@@ -1,3 +1,4 @@
+import { getApiBase } from '../config';
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -36,7 +37,7 @@ const SearchPage = () => {
     setLoading(true);
     try {
       const params = new URLSearchParams({ ...searchForm, inStock: String(filters.inStock) });
-      const { data } = await axios.get(`${process.env.REACT_APP_API_URL}/api/search?${params.toString()}`);
+      const { data } = await axios.get(`${getApiBase()}/api/search?${params.toString()}`);
       setResults(data.results || []);
       setSearchParams(searchForm);
     } catch (err) {
@@ -82,3 +83,5 @@ const SearchPage = () => {
 };
 
 export default SearchPage;
+
+

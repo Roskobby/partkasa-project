@@ -1,3 +1,4 @@
+import { getApiBase } from '../config';
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import useSEO from '../hooks/useSEO';
@@ -14,7 +15,7 @@ const ProfilePage = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/api/users/profile`, {
+        const response = await fetch(`${getApiBase()}/api/users/profile`, {
           headers: { Authorization: `Bearer ${user.token}` },
         });
         const data = await response.json();
@@ -31,7 +32,7 @@ const ProfilePage = () => {
 
   const handleSave = async () => {
     try {
-      await fetch(`${process.env.REACT_APP_API_URL}/api/users/profile`, {
+      await fetch(`${getApiBase()}/api/users/profile`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${user.token}` },
         body: JSON.stringify(formData),
@@ -85,3 +86,5 @@ const ProfilePage = () => {
 };
 
 export default ProfilePage;
+
+

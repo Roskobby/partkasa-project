@@ -1,3 +1,4 @@
+import { getApiBase } from '../../config';
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import VendorDashboardLayout from '../../components/layout/VendorDashboardLayout';
@@ -17,7 +18,7 @@ const DashboardPage = () => {
     const fetchDashboardData = async () => {
       try {
         // Fetch stats
-        const statsResponse = await fetch(`${process.env.REACT_APP_API_URL}/api/vendor/stats`, {
+        const statsResponse = await fetch(`${getApiBase()}/api/vendor/stats`, {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
@@ -26,7 +27,7 @@ const DashboardPage = () => {
         setStats(statsData);
 
         // Fetch recent orders
-        const ordersResponse = await fetch(`${process.env.REACT_APP_API_URL}/api/vendor/orders/recent`, {
+        const ordersResponse = await fetch(`${getApiBase()}/api/vendor/orders/recent`, {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
@@ -228,3 +229,6 @@ const DashboardPage = () => {
 };
 
 export default DashboardPage;
+
+
+
